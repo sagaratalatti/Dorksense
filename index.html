@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DORKSENSE // RAW MODE</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* IMPORT FONTS */
+        @import url('https://fonts.googleapis.com/css2?family=Archivo:wght@900&family=Space+Mono:ital,wght@0,400;0,700;1,400&display=swap');
+
+        /* CUSTOM CONFIGURATION */
+        :root {
+            --neon-lime: #ccff00;
+            --hot-pink: #ff00ff;
+            --electric-blue: #3300ff;
+            --paper: #f0f0f0;
+            --ink: #111111;
+        }
+
+        body {
+            background-color: var(--paper);
+            color: var(--ink);
+            font-family: 'Space Mono', monospace;
+            overflow-x: hidden;
+            cursor: crosshair;
+        }
+
+        h1, h2, h3 {
+            font-family: 'Archivo', sans-serif;
+            text-transform: uppercase;
+        }
+
+        /* NOISE TEXTURE OVERLAY */
+        .noise {
+            position: fixed;
+            top: 0; left: 0; width: 100vw; height: 100vh;
+            pointer-events: none;
+            z-index: 50;
+            opacity: 0.05;
+            background: url('https://grainy-gradients.vercel.app/noise.svg');
+        }
+
+        /* HARD SHADOW UTILITIES */
+        .hard-shadow {
+            box-shadow: 6px 6px 0px 0px var(--ink);
+            transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        
+        .hard-shadow:hover {
+            transform: translate(-2px, -2px);
+            box-shadow: 10px 10px 0px 0px var(--ink);
+        }
+
+        .hard-shadow:active {
+            transform: translate(2px, 2px);
+            box-shadow: 2px 2px 0px 0px var(--ink);
+        }
+
+        /* MARQUEE ANIMATION */
+        .marquee-container {
+            overflow: hidden;
+            white-space: nowrap;
+        }
+        .marquee-content {
+            display: inline-block;
+            animation: scroll 20s linear infinite;
+        }
+        @keyframes scroll {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(-50%); }
+        }
+
+        /* SCROLL REVEAL ANIMATION */
+        .reveal {
+            opacity: 0;
+            transform: translateY(100px) rotate(2deg);
+            transition: all 0.8s cubic-bezier(0.5, 0, 0, 1);
+        }
+        .reveal.active {
+            opacity: 1;
+            transform: translateY(0) rotate(0deg);
+        }
+
+        /* CUSTOM SCROLLBAR */
+        ::-webkit-scrollbar { width: 15px; }
+        ::-webkit-scrollbar-track { background: var(--ink); }
+        ::-webkit-scrollbar-thumb { 
+            background: var(--neon-lime); 
+            border: 3px solid var(--ink); 
+        }
+        ::-webkit-scrollbar-thumb:hover { background: var(--hot-pink); }
+
+        /* GLITCH TEXT EFFECT */
+        .glitch {
+            position: relative;
+        }
+        .glitch::before, .glitch::after {
+            content: attr(data-text);
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: var(--paper);
+        }
+        .glitch::before {
+            left: 2px; text-shadow: -1px 0 red; clip-path: inset(0 0 0 0);
+            animation: glitch-anim-1 2s infinite linear alternate-reverse;
+        }
+        .glitch::after {
+            left: -2px; text-shadow: -1px 0 blue; clip-path: inset(0 0 0 0);
+            animation: glitch-anim-2 3s infinite linear alternate-reverse;
+        }
+        @keyframes glitch-anim-1 {
+            0% { clip-path: inset(20% 0 80% 0); }
+            20% { clip-path: inset(60% 0 10% 0); }
+            40% { clip-path: inset(40% 0 50% 0); }
+            60% { clip-path: inset(80% 0 5% 0); }
+            80% { clip-path: inset(10% 0 70% 0); }
+            100% { clip-path: inset(30% 0 20% 0); }
+        }
+        @keyframes glitch-anim-2 {
+            0% { clip-path: inset(10% 0 60% 0); }
+            20% { clip-path: inset(30% 0 20% 0); }
+            40% { clip-path: inset(70% 0 10% 0); }
+            60% { clip-path: inset(20% 0 50% 0); }
+            80% { clip-path: inset(50% 0 30% 0); }
+            100% { clip-path: inset(10% 0 80% 0); }
+        }
+    </style>
+</head>
+<body class="selection:bg-pink-500 selection:text-white">
+
+    <div class="noise"></div>
+
+    <div class="w-full bg-black text-[#ccff00] border-b-4 border-black py-3 text-xl font-bold uppercase marquee-container relative z-40">
+        <div class="marquee-content">
+            DORKSENSE /// SYSTEM OVERRIDE /// CREATIVITY IS MESSY /// BUILD BREAK REPEAT /// MARKETING FOR THE BRAVE /// DORKSENSE /// SYSTEM OVERRIDE /// CREATIVITY IS MESSY /// BUILD BREAK REPEAT /// MARKETING FOR THE BRAVE ///
+        </div>
+    </div>
+
+    <nav class="flex justify-between items-center p-6 border-b-4 border-black sticky top-0 bg-[#f0f0f0] z-30">
+        <div class="text-3xl font-black tracking-tighter italic">DS_v1.0</div>
+        <div class="hidden md:flex gap-6">
+            <a href="#" class="hover:underline decoration-4 decoration-[#ff00ff] underline-offset-4">Manifesto</a>
+            <a href="#" class="hover:underline decoration-4 decoration-[#ccff00] underline-offset-4">Lab</a>
+            <a href="#" class="hover:underline decoration-4 decoration-[#3300ff] underline-offset-4">Contact</a>
+        </div>
+        <button class="bg-[#3300ff] text-white px-6 py-2 font-bold border-2 border-black hard-shadow">
+            LOGIN
+        </button>
+    </nav>
+
+    <section class="min-h-screen flex flex-col items-center justify-center p-4 relative overflow-hidden">
+        
+        <div class="absolute top-20 left-10 w-32 h-32 bg-[#ccff00] rounded-full border-4 border-black mix-blend-multiply animate-bounce"></div>
+        <div class="absolute bottom-20 right-10 w-48 h-48 bg-[#ff00ff] rounded-none rotate-12 border-4 border-black -z-10"></div>
+
+        <div class="text-center relative z-10 max-w-5xl">
+            <div class="bg-white border-4 border-black p-2 inline-block rotate-[-2deg] mb-6 reveal">
+                <span class="font-bold text-sm tracking-widest">EST. 2025 // PUNE, INDIA</span>
+            </div>
+            
+            <h1 class="text-[12vw] leading-[0.85] tracking-tighter mb-8 glitch reveal" data-text="DORKSENSE">
+                DORKSENSE
+            </h1>
+
+            <p class="text-xl md:text-3xl max-w-2xl mx-auto font-bold bg-[#ccff00] border-4 border-black p-4 rotate-1 reveal">
+                Self-taught. Data-driven. <br>We don't follow trends. We break them.
+            </p>
+
+            <div class="mt-12 flex flex-col md:flex-row gap-6 justify-center items-center reveal">
+                <button class="bg-black text-white px-10 py-5 text-2xl font-black border-4 border-black hover:bg-white hover:text-black transition-colors hard-shadow">
+                    START PROJECT
+                </button>
+                <a href="#" class="text-xl underline decoration-wavy decoration-4 decoration-[#3300ff] hover:text-[#3300ff]">
+                    Read the documentation ->
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <section class="p-4 md:p-12 border-t-4 border-black bg-[#ff00ff]">
+        <h2 class="text-6xl md:text-8xl mb-12 text-white text-stroke-black reveal">THE TOOLKIT</h2>
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            
+            <div class="bg-white border-4 border-black p-8 hard-shadow rotate-1 reveal group hover:rotate-0 transition-transform">
+                <div class="w-12 h-12 bg-black mb-4"></div>
+                <h3 class="text-3xl mb-4 group-hover:text-[#3300ff]">Strategy</h3>
+                <p>No fluff. Just raw analytics and consumer psychology. We figure it out so you don't have to.</p>
+            </div>
+
+            <div class="bg-[#ccff00] border-4 border-black p-8 hard-shadow -rotate-1 reveal hover:rotate-0 transition-transform">
+                <div class="w-12 h-12 bg-white border-4 border-black mb-4 rounded-full"></div>
+                <h3 class="text-3xl mb-4">Development</h3>
+                <p>WordPress to Custom Stacks. Built for speed, brutalism, and conversion.</p>
+            </div>
+
+            <div class="bg-[#3300ff] text-white border-4 border-black p-8 hard-shadow rotate-2 reveal hover:rotate-0 transition-transform">
+                <div class="w-12 h-12 bg-[#ff00ff] border-4 border-white mb-4"></div>
+                <h3 class="text-3xl mb-4">E-Commerce</h3>
+                <p>From inventory to checkout. We understand the full funnel.</p>
+            </div>
+
+        </div>
+    </section>
+
+    <section class="overflow-hidden border-y-4 border-black bg-white py-20">
+        <div class="reveal">
+            <h2 class="text-[8vw] whitespace-nowrap leading-none font-black text-transparent" style="-webkit-text-stroke: 3px black;">
+                OBSERVE > ANALYZE > FIGURE IT OUT >
+            </h2>
+        </div>
+        <div class="reveal delay-100">
+            <h2 class="text-[8vw] whitespace-nowrap leading-none font-black text-black ml-[10vw]">
+                > WORKOUT > EXECUTE > SUCCEED
+            </h2>
+        </div>
+    </section>
+
+    <footer class="bg-black text-white p-12 md:p-24 border-t-4 border-black">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-12">
+            <div>
+                <h2 class="text-6xl md:text-8xl mb-6 text-[#ccff00]">LET'S TALK</h2>
+                <p class="text-xl max-w-md font-mono text-gray-400">
+                    Built for the self-motivated. <br>
+                    Currently operating out of Pune, MH.
+                </p>
+            </div>
+            <div class="flex flex-col gap-4 text-2xl font-bold items-start md:items-end">
+                <a href="#" class="hover:bg-[#ff00ff] hover:text-black px-2">INSTAGRAM</a>
+                <a href="#" class="hover:bg-[#ccff00] hover:text-black px-2">TWITTER / X</a>
+                <a href="#" class="hover:bg-[#3300ff] hover:text-white px-2">LINKEDIN</a>
+                <a href="#" class="hover:bg-white hover:text-black px-2">EMAIL</a>
+            </div>
+        </div>
+        <div class="mt-24 pt-12 border-t-2 border-gray-800 text-sm flex justify-between">
+            <span>© 2025 DORKSENSE</span>
+            <span>NO COOKIES. JUST CODE.</span>
+        </div>
+    </footer>
+
+    <script>
+        // SCROLL OBSERVER
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: "0px"
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('active');
+                }
+            });
+        }, observerOptions);
+
+        document.querySelectorAll('.reveal').forEach(el => {
+            observer.observe(el);
+        });
+
+        // MOUSE PARALLAX FOR HERO ELEMENTS
+        document.addEventListener('mousemove', (e) => {
+            const x = e.clientX / window.innerWidth;
+            const y = e.clientY / window.innerHeight;
+            
+            const title = document.querySelector('h1');
+            
+            // Subtle tilt effect on the main title
+            title.style.transform = `translate(-${x * 20}px, -${y * 20}px)`;
+        });
+    </script>
+</body>
+</html>
