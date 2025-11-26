@@ -3,13 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>DORKSENSE // RAW MODE</title>
+    <title>DORKSENSE // V3 FULL STACK</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        /* IMPORT FONTS */
         @import url('https://fonts.googleapis.com/css2?family=Archivo:wght@900&family=Space+Mono:ital,wght@0,400;0,700;1,400&display=swap');
 
-        /* CUSTOM CONFIGURATION */
         :root {
             --neon-lime: #ccff00;
             --hot-pink: #ff00ff;
@@ -23,251 +21,305 @@
             color: var(--ink);
             font-family: 'Space Mono', monospace;
             overflow-x: hidden;
-            cursor: crosshair;
+            cursor: none;
         }
 
-        h1, h2, h3 {
-            font-family: 'Archivo', sans-serif;
-            text-transform: uppercase;
-        }
+        h1, h2, h3, h4 { font-family: 'Archivo', sans-serif; text-transform: uppercase; }
 
-        /* NOISE TEXTURE OVERLAY */
+        /* UTILITIES */
         .noise {
-            position: fixed;
-            top: 0; left: 0; width: 100vw; height: 100vh;
-            pointer-events: none;
-            z-index: 50;
-            opacity: 0.05;
+            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+            pointer-events: none; z-index: 50; opacity: 0.05;
             background: url('https://grainy-gradients.vercel.app/noise.svg');
         }
 
-        /* HARD SHADOW UTILITIES */
         .hard-shadow {
-            box-shadow: 6px 6px 0px 0px var(--ink);
+            box-shadow: 8px 8px 0px 0px var(--ink);
             transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
+        .hard-shadow:hover { transform: translate(-2px, -2px); box-shadow: 12px 12px 0px 0px var(--ink); }
+        .hard-shadow:active { transform: translate(2px, 2px); box-shadow: 4px 4px 0px 0px var(--ink); }
+
+        /* CURSOR */
+        .cursor-dot, .cursor-circle {
+            position: fixed; top: 0; left: 0; transform: translate(-50%, -50%);
+            border-radius: 50%; z-index: 9999; pointer-events: none;
+        }
+        .cursor-dot { width: 10px; height: 10px; background-color: var(--ink); }
+        .cursor-circle { 
+            width: 40px; height: 40px; border: 2px solid var(--ink); 
+            transition: width 0.2s, height 0.2s, background-color 0.2s;
+        }
+        body:hover .cursor-circle.hovered {
+            width: 80px; height: 80px; background-color: rgba(204, 255, 0, 0.5); border-color: transparent; mix-blend-mode: difference;
+        }
+
+        /* SCROLL ANIMATIONS */
+        .reveal { opacity: 0; transform: translateY(50px); transition: all 0.8s ease; }
+        .reveal.active { opacity: 1; transform: translateY(0); }
+
+        /* RECEIPT PATTERN */
+        .receipt-edge {
+            background: radial-gradient(circle, transparent 50%, #ffffff 50%) 0 100%/20px 20px repeat-x;
+            height: 20px; width: 100%; position: absolute; bottom: -20px; left: 0; transform: rotate(180deg);
+        }
+
+        /* HORIZONTAL SCROLL SECTION */
+        .scrolling-wrapper {
+            -webkit-overflow-scrolling: touch;
+            scrollbar-width: none; /* Firefox */
+        }
+        .scrolling-wrapper::-webkit-scrollbar { display: none; }
+
+        /* ACCORDION STYLING */
+        details > summary { list-style: none; cursor: none; }
+        details > summary::-webkit-details-marker { display: none; }
+        details[open] summary ~ * { animation: sweep .5s ease-in-out; }
+        @keyframes sweep { 0% {opacity: 0; transform: translateY(-10px)} 100% {opacity: 1; transform: translateY(0)} }
+
+        /* GLITCH & MARQUEE */
+        .marquee-container { overflow: hidden; white-space: nowrap; }
+        .marquee-content { display: inline-block; animation: scroll 20s linear infinite; }
+        @keyframes scroll { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
         
-        .hard-shadow:hover {
-            transform: translate(-2px, -2px);
-            box-shadow: 10px 10px 0px 0px var(--ink);
-        }
-
-        .hard-shadow:active {
-            transform: translate(2px, 2px);
-            box-shadow: 2px 2px 0px 0px var(--ink);
-        }
-
-        /* MARQUEE ANIMATION */
-        .marquee-container {
-            overflow: hidden;
-            white-space: nowrap;
-        }
-        .marquee-content {
-            display: inline-block;
-            animation: scroll 20s linear infinite;
-        }
-        @keyframes scroll {
-            0% { transform: translateX(0); }
-            100% { transform: translateX(-50%); }
-        }
-
-        /* SCROLL REVEAL ANIMATION */
-        .reveal {
-            opacity: 0;
-            transform: translateY(100px) rotate(2deg);
-            transition: all 0.8s cubic-bezier(0.5, 0, 0, 1);
-        }
-        .reveal.active {
-            opacity: 1;
-            transform: translateY(0) rotate(0deg);
-        }
-
-        /* CUSTOM SCROLLBAR */
-        ::-webkit-scrollbar { width: 15px; }
-        ::-webkit-scrollbar-track { background: var(--ink); }
-        ::-webkit-scrollbar-thumb { 
-            background: var(--neon-lime); 
-            border: 3px solid var(--ink); 
-        }
-        ::-webkit-scrollbar-thumb:hover { background: var(--hot-pink); }
-
-        /* GLITCH TEXT EFFECT */
-        .glitch {
-            position: relative;
-        }
+        .glitch { position: relative; }
         .glitch::before, .glitch::after {
-            content: attr(data-text);
-            position: absolute;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: var(--paper);
+            content: attr(data-text); position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: var(--paper);
         }
-        .glitch::before {
-            left: 2px; text-shadow: -1px 0 red; clip-path: inset(0 0 0 0);
-            animation: glitch-anim-1 2s infinite linear alternate-reverse;
-        }
-        .glitch::after {
-            left: -2px; text-shadow: -1px 0 blue; clip-path: inset(0 0 0 0);
-            animation: glitch-anim-2 3s infinite linear alternate-reverse;
-        }
-        @keyframes glitch-anim-1 {
-            0% { clip-path: inset(20% 0 80% 0); }
-            20% { clip-path: inset(60% 0 10% 0); }
-            40% { clip-path: inset(40% 0 50% 0); }
-            60% { clip-path: inset(80% 0 5% 0); }
-            80% { clip-path: inset(10% 0 70% 0); }
-            100% { clip-path: inset(30% 0 20% 0); }
-        }
-        @keyframes glitch-anim-2 {
-            0% { clip-path: inset(10% 0 60% 0); }
-            20% { clip-path: inset(30% 0 20% 0); }
-            40% { clip-path: inset(70% 0 10% 0); }
-            60% { clip-path: inset(20% 0 50% 0); }
-            80% { clip-path: inset(50% 0 30% 0); }
-            100% { clip-path: inset(10% 0 80% 0); }
-        }
+        .glitch::before { left: 2px; text-shadow: -1px 0 red; clip-path: inset(0 0 0 0); animation: glitch-anim-1 2s infinite linear alternate-reverse; }
+        .glitch::after { left: -2px; text-shadow: -1px 0 blue; clip-path: inset(0 0 0 0); animation: glitch-anim-2 3s infinite linear alternate-reverse; }
+        @keyframes glitch-anim-1 { 0% { clip-path: inset(20% 0 80% 0); } 100% { clip-path: inset(30% 0 20% 0); } }
+        @keyframes glitch-anim-2 { 0% { clip-path: inset(10% 0 60% 0); } 100% { clip-path: inset(10% 0 80% 0); } }
     </style>
 </head>
 <body class="selection:bg-pink-500 selection:text-white">
 
     <div class="noise"></div>
+    <div class="cursor-dot"></div>
+    <div class="cursor-circle"></div>
+
+    <div id="preloader" class="fixed inset-0 bg-black text-[#ccff00] z-[10000] flex flex-col justify-center items-center transition-transform duration-700">
+        <div class="text-[15vw] font-black leading-none" id="counter">0%</div>
+        <div class="text-xl font-mono mt-4">BOOTING DORKSENSE_KERNEL...</div>
+    </div>
 
     <div class="w-full bg-black text-[#ccff00] border-b-4 border-black py-3 text-xl font-bold uppercase marquee-container relative z-40">
         <div class="marquee-content">
-            DORKSENSE /// SYSTEM OVERRIDE /// CREATIVITY IS MESSY /// BUILD BREAK REPEAT /// MARKETING FOR THE BRAVE /// DORKSENSE /// SYSTEM OVERRIDE /// CREATIVITY IS MESSY /// BUILD BREAK REPEAT /// MARKETING FOR THE BRAVE ///
+            DORKSENSE /// PUNE /// SELF-TAUGHT /// DATA DRIVEN /// NO BS MARKETING /// DORKSENSE /// PUNE /// SELF-TAUGHT /// DATA DRIVEN /// NO BS MARKETING ///
         </div>
     </div>
 
     <nav class="flex justify-between items-center p-6 border-b-4 border-black sticky top-0 bg-[#f0f0f0] z-30">
-        <div class="text-3xl font-black tracking-tighter italic">DS_v1.0</div>
-        <div class="hidden md:flex gap-6">
-            <a href="#" class="hover:underline decoration-4 decoration-[#ff00ff] underline-offset-4">Manifesto</a>
-            <a href="#" class="hover:underline decoration-4 decoration-[#ccff00] underline-offset-4">Lab</a>
-            <a href="#" class="hover:underline decoration-4 decoration-[#3300ff] underline-offset-4">Contact</a>
-        </div>
-        <button class="bg-[#3300ff] text-white px-6 py-2 font-bold border-2 border-black hard-shadow">
-            LOGIN
-        </button>
+        <div class="text-3xl font-black italic hover:text-[#3300ff]" data-hover>DS_v3</div>
+        <button class="bg-[#3300ff] text-white px-6 py-2 font-bold border-2 border-black hard-shadow" data-hover>MENU</button>
     </nav>
 
-    <section class="min-h-screen flex flex-col items-center justify-center p-4 relative overflow-hidden">
+    <section class="min-h-[90vh] flex flex-col items-center justify-center p-4 relative border-b-4 border-black">
+        <div class="absolute right-10 top-20 bg-[#ff00ff] text-white p-4 border-4 border-black rotate-12 hidden md:block draggable cursor-move hard-shadow" id="drag-me">
+            <span class="font-bold">DRAG THIS<br>STICKER</span>
+        </div>
+
+        <h1 class="text-[13vw] leading-[0.8] tracking-tighter mb-4 glitch text-center" data-text="DORKSENSE" data-hover>DORKSENSE</h1>
+        <p class="text-2xl font-bold bg-[#ccff00] border-4 border-black p-2 -rotate-2">
+            WE FIGURED IT OUT. SO YOU WIN.
+        </p>
+    </section>
+
+    <section class="border-b-4 border-black bg-white overflow-hidden py-12">
+        <div class="px-6 mb-8 flex items-end justify-between">
+            <h2 class="text-6xl md:text-8xl leading-none">THE<br>EVIDENCE</h2>
+            <p class="font-mono text-sm max-w-xs text-right hidden md:block">SCROLL RIGHT -> <br> WE BUILD E-COMMERCE ENGINES THAT PRINT MONEY.</p>
+        </div>
         
-        <div class="absolute top-20 left-10 w-32 h-32 bg-[#ccff00] rounded-full border-4 border-black mix-blend-multiply animate-bounce"></div>
-        <div class="absolute bottom-20 right-10 w-48 h-48 bg-[#ff00ff] rounded-none rotate-12 border-4 border-black -z-10"></div>
-
-        <div class="text-center relative z-10 max-w-5xl">
-            <div class="bg-white border-4 border-black p-2 inline-block rotate-[-2deg] mb-6 reveal">
-                <span class="font-bold text-sm tracking-widest">EST. 2025 // PUNE, INDIA</span>
-            </div>
+        <div class="scrolling-wrapper flex gap-8 overflow-x-auto px-6 pb-12 snap-x snap-mandatory">
             
-            <h1 class="text-[12vw] leading-[0.85] tracking-tighter mb-8 glitch reveal" data-text="DORKSENSE">
-                DORKSENSE
-            </h1>
-
-            <p class="text-xl md:text-3xl max-w-2xl mx-auto font-bold bg-[#ccff00] border-4 border-black p-4 rotate-1 reveal">
-                Self-taught. Data-driven. <br>We don't follow trends. We break them.
-            </p>
-
-            <div class="mt-12 flex flex-col md:flex-row gap-6 justify-center items-center reveal">
-                <button class="bg-black text-white px-10 py-5 text-2xl font-black border-4 border-black hover:bg-white hover:text-black transition-colors hard-shadow">
-                    START PROJECT
-                </button>
-                <a href="#" class="text-xl underline decoration-wavy decoration-4 decoration-[#3300ff] hover:text-[#3300ff]">
-                    Read the documentation ->
-                </a>
+            <div class="min-w-[85vw] md:min-w-[60vw] bg-[#f0f0f0] border-4 border-black p-8 snap-center hard-shadow flex flex-col justify-between h-[60vh] relative group" data-hover>
+                <div class="absolute top-4 right-4 bg-black text-white px-3 py-1 font-mono text-xs">CASE_01</div>
+                <div>
+                    <h3 class="text-4xl md:text-6xl mb-4 group-hover:text-[#3300ff] transition-colors">SNEAKER DROP</h3>
+                    <p class="text-xl font-mono border-l-4 border-[#ff00ff] pl-4">Wordpress + WooCommerce. Custom scarcity engine. Sold out in 14 minutes.</p>
+                </div>
+                <div class="w-full h-32 bg-black mt-4 overflow-hidden relative">
+                    <img src="https://images.unsplash.com/photo-1552346154-21d32810aba3?q=80&w=2670&auto=format&fit=crop" class="object-cover w-full h-full opacity-50 grayscale group-hover:grayscale-0 transition-all duration-500">
+                </div>
             </div>
+
+            <div class="min-w-[85vw] md:min-w-[60vw] bg-[#3300ff] text-white border-4 border-black p-8 snap-center hard-shadow flex flex-col justify-between h-[60vh] relative group" data-hover>
+                <div class="absolute top-4 right-4 bg-white text-black px-3 py-1 font-mono text-xs">CASE_02</div>
+                <div>
+                    <h3 class="text-4xl md:text-6xl mb-4 text-[#ccff00]">LOCAL BRAND</h3>
+                    <p class="text-xl font-mono border-l-4 border-white pl-4">Self-funded startup scaling. From 0 to 10k users via organic search & brutalist ads.</p>
+                </div>
+                <div class="w-full h-32 bg-white mt-4 overflow-hidden relative">
+                    <img src="https://images.unsplash.com/photo-1611162617474-5b21e879e113?q=80&w=2574&auto=format&fit=crop" class="object-cover w-full h-full mix-blend-multiply group-hover:scale-110 transition-transform duration-700">
+                </div>
+            </div>
+
+            <div class="min-w-[85vw] md:min-w-[60vw] bg-[#ccff00] border-4 border-black p-8 snap-center hard-shadow flex flex-col justify-between h-[60vh] relative group" data-hover>
+                <div class="absolute top-4 right-4 bg-black text-white px-3 py-1 font-mono text-xs">CASE_03</div>
+                <div>
+                    <h3 class="text-4xl md:text-6xl mb-4">THE LAB</h3>
+                    <p class="text-xl font-mono border-l-4 border-black pl-4">Experimental marketing. We broke the algorithm to see what's inside.</p>
+                </div>
+                <div class="w-full h-32 bg-white mt-4 flex items-center justify-center border-2 border-black">
+                    <span class="text-4xl font-black">CONFIDENTIAL</span>
+                </div>
+            </div>
+
         </div>
     </section>
 
-    <section class="p-4 md:p-12 border-t-4 border-black bg-[#ff00ff]">
-        <h2 class="text-6xl md:text-8xl mb-12 text-white text-stroke-black reveal">THE TOOLKIT</h2>
+    <section class="py-24 bg-[#ff00ff] flex justify-center items-center px-4 border-b-4 border-black">
+        <div class="bg-white w-full max-w-md relative p-8 pb-12 shadow-[15px_15px_0px_0px_rgba(0,0,0,1)] rotate-2 hover:rotate-0 transition-transform duration-300" data-hover>
+            <div class="text-center border-b-2 border-dashed border-gray-400 pb-6 mb-6">
+                <h2 class="text-3xl font-black mb-2">DORKSENSE INC.</h2>
+                <p class="font-mono text-sm text-gray-500">PUNE, MH, INDIA</p>
+                <p class="font-mono text-sm text-gray-500">ORDER #: 80085-V2</p>
+                <p class="font-mono text-xs mt-2">--------------------------------</p>
+            </div>
+
+            <div class="font-mono text-sm space-y-4 mb-8">
+                <div class="flex justify-between items-start">
+                    <div>
+                        <span class="font-bold block">01. WEB DEV (FULL)</span>
+                        <span class="text-xs text-gray-500">Wordpress / Custom / Raw</span>
+                    </div>
+                    <span class="font-bold">$1,500</span>
+                </div>
+                <div class="flex justify-between items-start">
+                    <div>
+                        <span class="font-bold block">02. MARKETING STRATEGY</span>
+                        <span class="text-xs text-gray-500">Consumer Analysis</span>
+                    </div>
+                    <span class="font-bold">$800</span>
+                </div>
+                <div class="flex justify-between items-start">
+                    <div>
+                        <span class="font-bold block">03. SEO OPTIMIZATION</span>
+                        <span class="text-xs text-gray-500">Ranking #1 or die trying</span>
+                    </div>
+                    <span class="font-bold">$500</span>
+                </div>
+                 <div class="flex justify-between items-start text-[#3300ff]">
+                    <div>
+                        <span class="font-bold block">04. CONSULTATION</span>
+                        <span class="text-xs">1hr Brainstorm</span>
+                    </div>
+                    <span class="font-bold">FREE</span>
+                </div>
+            </div>
+
+            <div class="border-t-2 border-dashed border-gray-400 pt-4">
+                <div class="flex justify-between text-2xl font-black">
+                    <span>TOTAL</span>
+                    <span>LET'S TALK</span>
+                </div>
+                <div class="text-center mt-8">
+                    <img src="https://bwipjs-api.metafloor.com/?bcid=code128&text=DORKSENSE&scale=3&height=10&includetext" class="w-full opacity-80">
+                </div>
+                <p class="text-center font-mono text-xs mt-4">THANK YOU FOR SHOPPING</p>
+            </div>
+
+            <div class="receipt-edge"></div>
+        </div>
+    </section>
+
+    <section class="bg-[#ccff00] p-6 md:p-24 border-b-4 border-black">
+        <h2 class="text-5xl md:text-7xl mb-12 uppercase text-stroke-black">The Interrogation</h2>
         
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            
-            <div class="bg-white border-4 border-black p-8 hard-shadow rotate-1 reveal group hover:rotate-0 transition-transform">
-                <div class="w-12 h-12 bg-black mb-4"></div>
-                <h3 class="text-3xl mb-4 group-hover:text-[#3300ff]">Strategy</h3>
-                <p>No fluff. Just raw analytics and consumer psychology. We figure it out so you don't have to.</p>
-            </div>
+        <div class="max-w-4xl mx-auto space-y-4">
+            <details class="group bg-white border-4 border-black hard-shadow" data-hover>
+                <summary class="flex justify-between items-center p-6 text-xl md:text-2xl font-bold cursor-pointer select-none">
+                    <span>WHY "DORKSENSE"?</span>
+                    <span class="transform group-open:rotate-180 transition-transform text-4xl">+</span>
+                </summary>
+                <div class="p-6 pt-0 font-mono text-lg border-t-2 border-black border-dashed">
+                    <p>Because "Professional Corporate Solutions" was taken. We embrace the dorkiness of deep-diving into data, code, and consumer psychology. It's not about being cool; it's about being right.</p>
+                </div>
+            </details>
 
-            <div class="bg-[#ccff00] border-4 border-black p-8 hard-shadow -rotate-1 reveal hover:rotate-0 transition-transform">
-                <div class="w-12 h-12 bg-white border-4 border-black mb-4 rounded-full"></div>
-                <h3 class="text-3xl mb-4">Development</h3>
-                <p>WordPress to Custom Stacks. Built for speed, brutalism, and conversion.</p>
-            </div>
+            <details class="group bg-white border-4 border-black hard-shadow" data-hover>
+                <summary class="flex justify-between items-center p-6 text-xl md:text-2xl font-bold cursor-pointer select-none">
+                    <span>DO YOU DO WORDPRESS?</span>
+                    <span class="transform group-open:rotate-180 transition-transform text-4xl">+</span>
+                </summary>
+                <div class="p-6 pt-0 font-mono text-lg border-t-2 border-black border-dashed">
+                    <p>Yes. We started there. We mastered it. Whether it's a simple blog or a complex WooCommerce empire, we build it to load fast and sell hard.</p>
+                </div>
+            </details>
 
-            <div class="bg-[#3300ff] text-white border-4 border-black p-8 hard-shadow rotate-2 reveal hover:rotate-0 transition-transform">
-                <div class="w-12 h-12 bg-[#ff00ff] border-4 border-white mb-4"></div>
-                <h3 class="text-3xl mb-4">E-Commerce</h3>
-                <p>From inventory to checkout. We understand the full funnel.</p>
-            </div>
-
+            <details class="group bg-white border-4 border-black hard-shadow" data-hover>
+                <summary class="flex justify-between items-center p-6 text-xl md:text-2xl font-bold cursor-pointer select-none">
+                    <span>ARE YOU EXPENSIVE?</span>
+                    <span class="transform group-open:rotate-180 transition-transform text-4xl">+</span>
+                </summary>
+                <div class="p-6 pt-0 font-mono text-lg border-t-2 border-black border-dashed">
+                    <p>We are self-funded and lean. You pay for the brain, not the office ping-pong table. We charge based on the value we bring to your business.</p>
+                </div>
+            </details>
         </div>
     </section>
 
-    <section class="overflow-hidden border-y-4 border-black bg-white py-20">
-        <div class="reveal">
-            <h2 class="text-[8vw] whitespace-nowrap leading-none font-black text-transparent" style="-webkit-text-stroke: 3px black;">
-                OBSERVE > ANALYZE > FIGURE IT OUT >
-            </h2>
+    <footer class="bg-black text-white p-12 text-center relative overflow-hidden">
+        <div class="absolute inset-0 flex items-center justify-center opacity-10 pointer-events-none">
+            <h1 class="text-[30vw] font-black">END</h1>
         </div>
-        <div class="reveal delay-100">
-            <h2 class="text-[8vw] whitespace-nowrap leading-none font-black text-black ml-[10vw]">
-                > WORKOUT > EXECUTE > SUCCEED
-            </h2>
-        </div>
-    </section>
-
-    <footer class="bg-black text-white p-12 md:p-24 border-t-4 border-black">
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-12">
-            <div>
-                <h2 class="text-6xl md:text-8xl mb-6 text-[#ccff00]">LET'S TALK</h2>
-                <p class="text-xl max-w-md font-mono text-gray-400">
-                    Built for the self-motivated. <br>
-                    Currently operating out of Pune, MH.
-                </p>
-            </div>
-            <div class="flex flex-col gap-4 text-2xl font-bold items-start md:items-end">
-                <a href="#" class="hover:bg-[#ff00ff] hover:text-black px-2">INSTAGRAM</a>
-                <a href="#" class="hover:bg-[#ccff00] hover:text-black px-2">TWITTER / X</a>
-                <a href="#" class="hover:bg-[#3300ff] hover:text-white px-2">LINKEDIN</a>
-                <a href="#" class="hover:bg-white hover:text-black px-2">EMAIL</a>
-            </div>
-        </div>
-        <div class="mt-24 pt-12 border-t-2 border-gray-800 text-sm flex justify-between">
-            <span>© 2025 DORKSENSE</span>
-            <span>NO COOKIES. JUST CODE.</span>
-        </div>
+        <h2 class="text-4xl text-[#ff00ff] mb-8 relative z-10">READY TO BREAK THINGS?</h2>
+        <a href="mailto:hello@dorksense.com" class="inline-block bg-white text-black px-12 py-4 text-2xl font-black border-4 border-[#ccff00] hover:bg-[#ccff00] hover:scale-110 transition-transform relative z-10" data-hover>
+            EMAIL US
+        </a>
+        <p class="font-mono text-gray-500 mt-12 relative z-10">© 2025 DORKSENSE // PUNE</p>
     </footer>
 
     <script>
-        // SCROLL OBSERVER
-        const observerOptions = {
-            threshold: 0.1,
-            rootMargin: "0px"
-        };
+        // PRELOADER
+        const counter = document.getElementById('counter');
+        const preloader = document.getElementById('preloader');
+        let count = 0;
+        const interval = setInterval(() => {
+            count += Math.floor(Math.random() * 5) + 1;
+            if(count > 100) count = 100;
+            counter.innerText = count + '%';
+            if(count === 100) {
+                clearInterval(interval);
+                setTimeout(() => { preloader.style.transform = 'translateY(-100%)'; }, 500);
+            }
+        }, 30);
 
-        const observer = new IntersectionObserver((entries) => {
-            entries.forEach(entry => {
-                if (entry.isIntersecting) {
-                    entry.target.classList.add('active');
-                }
-            });
-        }, observerOptions);
-
-        document.querySelectorAll('.reveal').forEach(el => {
-            observer.observe(el);
-        });
-
-        // MOUSE PARALLAX FOR HERO ELEMENTS
+        // CURSOR
+        const cursorDot = document.querySelector('.cursor-dot');
+        const cursorCircle = document.querySelector('.cursor-circle');
         document.addEventListener('mousemove', (e) => {
-            const x = e.clientX / window.innerWidth;
-            const y = e.clientY / window.innerHeight;
-            
-            const title = document.querySelector('h1');
-            
-            // Subtle tilt effect on the main title
-            title.style.transform = `translate(-${x * 20}px, -${y * 20}px)`;
+            cursorDot.style.left = e.clientX + 'px';
+            cursorDot.style.top = e.clientY + 'px';
+            cursorCircle.animate({ left: e.clientX + 'px', top: e.clientY + 'px' }, { duration: 500, fill: "forwards" });
         });
+        document.querySelectorAll('[data-hover]').forEach(el => {
+            el.addEventListener('mouseenter', () => cursorCircle.classList.add('hovered'));
+            el.addEventListener('mouseleave', () => cursorCircle.classList.remove('hovered'));
+        });
+
+        // DRAGGABLE
+        const dragItem = document.getElementById("drag-me");
+        let active = false, currentX, currentY, initialX, initialY, xOffset = 0, yOffset = 0;
+        
+        dragItem.addEventListener("mousedown", dragStart);
+        document.addEventListener("mouseup", dragEnd);
+        document.addEventListener("mousemove", drag);
+
+        function dragStart(e) {
+            initialX = e.clientX - xOffset; initialY = e.clientY - yOffset;
+            if (e.target === dragItem || dragItem.contains(e.target)) active = true;
+        }
+        function dragEnd() { initialX = currentX; initialY = currentY; active = false; }
+        function drag(e) {
+            if (active) {
+                e.preventDefault();
+                currentX = e.clientX - initialX; currentY = e.clientY - initialY;
+                xOffset = currentX; yOffset = currentY;
+                dragItem.style.transform = `translate3d(${currentX}px, ${currentY}px, 0) rotate(12deg)`;
+            }
+        }
     </script>
 </body>
 </html>
